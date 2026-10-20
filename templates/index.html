@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+<main class="landing">
+  <section class="welcome-panel">
+    <h1 class="section-title">Добро пожаловать в MRC Rooms!</h1>
+    <div class="welcome-body">
+      <h2>[ Смотрим вместе ]</h2>
+      <p>MRC Rooms — это медиакомнаты для вас и ваших друзей.</p>
+      <p>Добавьте видео из VK, пригласите друзей и смотрите его одновременно.<br>Во время просмотра можно переписываться и разговаривать голосом.</p>
+    </div>
+  </section>
+  <div class="home-columns">
+    <section class="create-card" id="create">
+      <h2 class="section-title">Создать комнату</h2>
+      <p class="form-intro">Заполните поля ниже. Видео можно добавить позже.</p>
+      <form id="create-form">
+        <div class="form-row"><label for="name">Ваше имя:</label><input id="name" name="name" maxlength="32" autocomplete="nickname" required></div>
+        <div class="form-row"><label for="title">Название комнаты:</label><input id="title" name="title" maxlength="80" required></div>
+        <div class="form-row"><label for="url">Ссылка на видео:</label><div><input id="url" name="url" type="url" placeholder="https://vkvideo.ru/video…" maxlength="2048"><p class="field-hint">Необязательно. Поддерживаются VK и VK Видео.</p></div></div>
+        <p class="form-error" id="form-error" role="alert" hidden></p>
+        <div class="form-submit"><button class="primary create-button" type="submit">Создать комнату</button></div>
+      </form>
+      <p class="card-footer">В комнату смогут войти все, у кого есть ссылка.</p>
+    </section>
+    <section class="about-panel">
+      <h2 class="section-title">Возможности</h2>
+      <dl class="feature-list">
+        <dt>Совместный просмотр</dt><dd>Воспроизведение, пауза и перемотка для всех участников.</dd>
+        <dt>Сообщения</dt><dd>Текстовый чат с сохранением переписки.</dd>
+        <dt>Голосовой чат</dt><dd>Разговор с друзьями во время просмотра. До 8 человек в комнате.</dd>
+      </dl>
+    </section>
+  </div>
+  <section class="help-panel" id="help">
+    <h2 class="section-title">Как пользоваться</h2>
+    <div class="help-body">
+      <ol><li>Создайте комнату и укажите своё имя.</li><li>Добавьте ссылку на видео из VK.</li><li>Нажмите «Пригласить друзей» и отправьте ссылку.</li><li>Для разговора нажмите «Подключить голос» и разрешите микрофон.</li></ol>
+      <p>Общим воспроизведением управляет создатель комнаты. Если видео не запускается, нажмите Play в плеере, затем «Синхронизировать».</p>
+    </div>
+  </section>
+</main>
+{% endblock %}
+{% block scripts %}<script type="module" src="{{ url_for('static', filename='home.js') }}"></script>{% endblock %}

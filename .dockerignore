@@ -1,0 +1,8 @@
+**
+!app.py
+!media.py
+!requirements.txt
+!static/
+!static/**
+!templates/
+!templates/**

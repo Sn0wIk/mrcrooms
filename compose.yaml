@@ -1,0 +1,21 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    init: true
+    environment:
+      MRC_ENV: ${MRC_ENV:-development}
+      SECRET_KEY: ${SECRET_KEY:-}
+      ICE_SERVERS_JSON: ${ICE_SERVERS_JSON:-}
+    ports:
+      - "127.0.0.1:8010:8010"
+    volumes:
+      - rooms-data:/data
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  rooms-data:

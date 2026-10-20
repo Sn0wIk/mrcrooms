@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}{{ room['title'] }} — MRC Rooms{% endblock %}
+{% block content %}
+<main class="room-shell" id="room" data-code="{{ room['code'] }}" data-owner="{{ 'true' if owner else 'false' }}">
+  <div class="room-heading">
+    <div><a class="back-link" href="/">Главная</a><span class="breadcrumb"> » Медиакомната</span><h1>{{ room['title'] }}</h1></div>
+    <button id="invite" class="secondary">Пригласить друзей</button>
+  </div>
+  <div class="room-grid">
+    <section class="watch-column">
+      <div class="video-panel">
+        <div class="panel-top"><span>Совместный просмотр</span><span id="connection">Подключение…</span></div>
+        <div class="player-area" id="player-area">
+          <div class="player-empty" id="player-empty"><div class="empty-play">[ ▶ ]</div><h2>Видео ещё не добавлено</h2><p>{{ 'Вставьте ссылку на VK Видео в поле ниже.' if owner else 'Дождитесь, пока создатель комнаты добавит видео.' }}</p></div>
+        </div>
+        <div class="player-info"><strong id="video-label">Пока без видео</strong><a id="video-source" target="_blank" rel="noopener noreferrer" hidden>Открыть в VK ↗</a></div>
+        <div class="sync-row">
+          <span id="sync-status" role="status">Ожидаем видео</span>
+          <button class="text-button" id="sync">Синхронизировать</button>
+        </div>
+        {% if owner %}<div class="controls">
+          <button class="secondary" data-action="play">Воспроизвести всем</button>
+          <button class="secondary" data-action="pause">Пауза</button>
+          <div class="seek-group"><input id="seek" aria-label="Позиция видео в секундах" type="number" min="0" max="604800" step="1" value="0"><span>сек.</span><button id="seek-button" class="text-button">Перейти</button></div>
+        </div>{% endif %}
+      </div>
+      {% if owner %}<form id="media-form" class="media-form">
+        <label for="media-url">Добавить видео</label>
+        <div class="input-button"><input id="media-url" type="url" maxlength="2048" placeholder="Ссылка на VK Видео" required><button class="primary">Добавить</button></div>
+        <p class="field-hint" id="media-hint">Поддерживаются ссылки VK, VK Видео и ссылки на встроенный плеер.</p>
+      </form>{% endif %}
+      <section class="voice-panel" id="voice-panel">
+        <div class="voice-heading"><h2>Участники и голосовой чат</h2><span class="count-badge" id="member-count">0 / 8</span></div>
+        <p class="muted" id="voice-status">Подключитесь, чтобы слышать и говорить.</p>
+        <div class="members" id="members"></div>
+        <div class="voice-actions"><button class="primary" id="voice-join">Подключить голос</button><button class="secondary" id="mute" hidden>Выключить микрофон</button><button class="danger-quiet" id="voice-leave" hidden>Отключиться</button><button class="text-button" id="audio-unlock" hidden>Включить звук участников</button></div>
+        <p id="voice-error" class="form-error" role="alert" hidden></p>
+        <div class="voice-diagnostics"><button class="text-button" id="voice-diagnostics" type="button">Диагностика подключения</button><pre id="voice-report" hidden></pre></div>
+        <p class="field-hint">Для комфортного просмотра используйте наушники.</p>
+      </section>
+    </section>
+    <aside class="chat-panel">
+      <div class="chat-heading"><h2>Сообщения комнаты</h2></div>
+      <div id="chat" class="chat-log" role="log" aria-label="Сообщения комнаты" aria-live="polite">
+        <div id="chat-empty" class="chat-empty"><strong>Сообщений пока нет.</strong><p>Напишите первое сообщение.</p></div>
+      </div>
+      <form id="chat-form"><label class="sr-only" for="chat-input">Сообщение</label><div class="chat-compose"><textarea id="chat-input" placeholder="Ваше сообщение…" maxlength="2000" rows="3" required></textarea><button class="primary" title="Отправить сообщение" aria-label="Отправить сообщение">Отправить</button></div><p class="field-hint">Enter — отправить<br>Shift + Enter — новая строка</p></form>
+    </aside>
+  </div>
+  <p class="room-footer">{{ 'Вы — создатель комнаты и управляете общим воспроизведением.' if owner else 'Общим воспроизведением управляет создатель комнаты.' }}</p>
+</main>
+<dialog id="join-dialog">
+  <form id="join-form"><h2>Вход в медиакомнату</h2><p class="muted">{{ room['title'] }}</p><label for="join-name">Ваше имя:</label><input id="join-name" maxlength="32" autocomplete="nickname" required><p id="join-error" class="form-error" role="alert" hidden></p><button class="primary create-button">Войти в комнату</button></form>
+</dialog>
+<script id="ice-config" type="application/json">{{ ice_servers|tojson }}</script>
+<div id="remote-audio"></div>
+{% endblock %}
+{% block scripts %}<script type="module" src="{{ url_for('static', filename='room.js', v='diagnostics-1') }}"></script>{% endblock %}

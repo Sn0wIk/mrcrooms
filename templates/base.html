@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#3b5998">
+  <meta name="csrf-token" content="{{ session['csrf'] }}">
+  <title>{% block title %}MRC Rooms | Медиакомнаты{% endblock %}</title>
+  <link rel="icon" href="{{ url_for('static', filename='icon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='classic-1') }}">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="header">
+      <a class="brand" href="/" aria-label="MRC Rooms — главная">[mrcrooms]</a>
+      <div class="header-right"><span>видео и общение с друзьями</span><nav aria-label="Верхнее меню"><a href="/">главная</a><a href="/#create">создать комнату</a><a href="/#help">помощь</a></nav></div>
+    </header>
+    <div class="utility-bar"><span>MRC Rooms</span><span>совместный просмотр · текстовый и голосовой чат</span></div>
+    <div class="site-layout">
+      <aside class="sidebar">
+        <nav class="side-menu" aria-label="Навигация">
+          <a href="/">Главная</a>
+          <a href="/#create">Создать комнату</a>
+          {% if request.endpoint == 'room_page' %}
+          <a href="#player-area">Смотреть видео</a>
+          <a href="#voice-panel">Голосовой чат</a>
+          <a href="#chat">Сообщения</a>
+          {% endif %}
+          <a href="/#help">Помощь</a>
+        </nav>
+        <section class="side-panel">
+          <h2>Медиакомнаты</h2>
+          <p>Смотрите одно видео и общайтесь в своей компании.</p>
+          <dl><dt>Участников:</dt><dd>до 8</dd><dt>Вход:</dt><dd>по ссылке</dd><dt>Регистрация:</dt><dd>не нужна</dd></dl>
+        </section>
+        <p class="sidebar-note">Чтобы пригласить друга, отправьте ему ссылку на комнату.</p>
+      </aside>
+      <div class="main-content">{% block content %}{% endblock %}</div>
+    </div>
+    <footer class="site-footer"><nav><a href="/">главная</a><a href="/#create">создать комнату</a><a href="/#help">помощь</a></nav><p>MRC Rooms © 2026</p></footer>
+  </div>
+  <div id="toast" class="toast" role="status" hidden></div>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

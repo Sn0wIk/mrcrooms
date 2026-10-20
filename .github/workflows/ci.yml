@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - run: python -m unittest test_app -v
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m playwright install --with-deps chromium
+      - run: python -u browser_check.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-screenshots
+          path: /tmp/mrc-rooms-*.png
+          if-no-files-found: ignore
+
+  container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Compose
+        env:
+          SECRET_KEY: ci-only-not-a-real-production-secret
+          DOMAIN: rooms.example.com
+        run: docker compose -f compose.yaml -f compose.production.yaml config --quiet
+      - run: docker build -t mrc-rooms:ci .
+      - name: Check production startup on a fresh volume
+        run: |
+          docker run -d --name mrc-rooms-ci \
+            -p 127.0.0.1:8012:8010 \
+            -e MRC_ENV=production \
+            -e SECRET_KEY=ci-only-not-a-real-production-secret \
+            -v mrc-rooms-ci:/data mrc-rooms:ci
+          curl --fail --retry 20 --retry-delay 1 --retry-connrefused http://127.0.0.1:8012/health
+          docker restart mrc-rooms-ci
+          curl --fail --retry 20 --retry-delay 1 --retry-connrefused http://127.0.0.1:8012/health
+      - name: Container logs
+        if: always()
+        run: docker logs mrc-rooms-ci || true
